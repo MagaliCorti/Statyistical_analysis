@@ -643,6 +643,118 @@ boxplot(sr ~ Management,
 	data = dune.env)
 
 
+     
+     
+# LESSON 9
+     
+### Conditionals ###
+
+x <- 100
+if(x > 10) {
+	print(paste(x, "is greater than 10"))
+}
+
+x <- 5
+if(x > 10) {
+	print(paste(x, "is greater than 10"))
+} else {
+	print(paste(x, "is less than 10"))
+}
+
+is_odd <- function(x) {
+	if(x %% 2 == 1) {
+		print(TRUE)
+	} else {
+		print(FALSE)
+	}
+}
+
+### Resuming from last lesson ###
+
+library(vegan)
+
+data("dune")
+data("dune.env")
+
+sr <- specnumber(dune)
+
+dune.env$sr <- sr
+
+boxplot(dune.env$sr ~ dune.env$Management)
+
+boxplot(sr ~ Management,
+	data = dune.env,
+	xlab = "Use Type",
+        ylab = "Thickness of soil A1 horizon (cm)")
+
+plot(sr ~ A1,
+     data = dune.env,
+     xlab = "Thickness of soil A1 horizon (cm)",
+     ylab = "Species richness")
+
+
+### Export graphs ###
+
+# Beware we're goind to export outputs to a new subfolder called "outputs"
+
+dir.create("outputs") # in this way you can create your "outputs" subfolder inside your project folder directly in R, otherwise you can navigate to your project folder outside of R/RStudio e and manually create the folder
+
+# you can erase the folder in R as well by running the following command: unlink("outputs", recursive = TRUE)
+
+plot(sr ~ A1,
+     data = dune.env,
+     xlab = "Thickness of soil A1 horizon (cm)",
+     ylab = "Species richness")
+
+png("outputs/sr_vs_a1.png", width = 350, height = 350)
+plot(sr ~ A1,
+     data = dune.env,
+     xlab = "Thickness of soil A1 horizon (cm)",
+     ylab = "Species richness")
+dev.off()
+
+
+### Export data ###
+
+dune_env_head <- head(dune.env)
+write.table(dune_env_head,
+            "outputs/dune_env_head.txt")
+
+dune_complete <- cbind(dune.env,
+                     dune)
+write.csv(dune_complete, "outputs/dune_complete.csv", row.names = F)
+
+
+### Transform the community matrix (with abundances now) into presence absence ###
+
+dune_pa <- decostand(dune,
+		      method = "pa") # note that decostand is a function from vegan, hence you need to load vegan to use it
+dune_pa
+
+
+### Association measures ###
+
+specnumber(dune, MARGIN = 2) # MARGIN = 2 enables us to calculate species frequencies
+
+species_by_use <- aggregate(dune_pa[c("Scorautu", "Trifrepe")],
+          by = list(dune.env$Use),
+          FUN = "sum") # here we calculate the frequencies of the two most common species across different Use categories
+
+chisq.test(species_by_use[, -1]) # here we test if the two species are indipendently distributed across different Use categories. The null hypothesis is that there are no difference, as the p-value much larger than .01 or .05 (actually, it's almost 1!), we can't refuse the null hypothesis
+
+install.packages("cramer")
+
+library(cramer)
+
+cramer.test(species_by_use[, 2],
+	    [, 3])
+	    
+cor.test(dune.env$sr,
+	 dune.env$A1)	    
+	    
+### How to export graphs from R http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs https://www.datamentor.io/r-programming/saving-plot/ https://intro2r.com/export-plots.html
+### How to open csv in Excel https://www.copytrans.net/support/how-to-open-a-csv-file-in-excel/
+
 
 
 
