@@ -757,4 +757,89 @@ cor.test(dune.env$sr,
 
 
 
+     
+# LESSON 10    
+# 10/12/2022
+
+library(vegan)
+data(dune)
+data(dune.env)
+
+dune.env$sr <- specnumber(dune)
+
+mat <- matrix(c(2, 9, 8, 1), ncol=2)
+colnames(mat) <- c("sp1", "sp2")
+rownames(mat) <- c("habitat1", "habitat2")
+mat
+
+
+# chi-square test
+chisq.test(mat)
+# p-value = 0,007001, very small non significant test for  alpha 5% or 1% -> two spp intependent
+# if high p-value, grater than alpha (0.05 or 0.01), test significant and spp not independent
+
+par(mfrow = c(1,2))
+hist(dune.env$sr[dune.env$Management == "HF"])
+hist(dune.env$sr[dune.env$Management != "HF"])
+dev.off()
+
+
+# t-test
+# test if pop are different for a certain measurament
+t.test(dune.env$sr[dune.env$Management == "HF"],
+       dune.env$sr[dune.env$Management != "HF"],
+       alternative = "greater"
+       )
+# p-value = 0.0001202 -> difference bw two management type is a associated with a diffeernce in sr
+# you cannot say that management type is driving changes in sr -> there could be other parameteres
+# you can just say the two things are associated
+
+
+# correlation test
+# we have 2 continuous variable, eg species richness (sr) correlated to Temperature? or to latitude?
+# correlation can be negative or positive
+plot(dune.env$A1,
+     dune.env$sr)
+cor.test(dune.env$A1,
+         dune.env$sr,
+         alternative = "less")
+# cor.test has by depault alternative = "two.sided"
+# p-value = 0.1782 -> not significant
+# cor -0.2177732 -> negative non significant correlation
+
+
+plot(mtcars$disp,
+     mtcars$hp)
+cor.test(mtcars$disp,
+         mtcars$hp,
+         alternative = "greater")
+# p-value = 3.571e-08 = 3.571 * 10^(-8) -> very significant correlation
+# 95 percent confidence interval
+# cor 0.7909486 (stong significant positive correlation)
+
+
+# correlation to test association bw two numerical variable for the same observation
+# t-test to test differences in given values or if you have a continuous value and two groups, or tu test if pop > or < of given value
+
+
+# regression model
+mod <- lm(hp ~ disp, data = mtcars)
+mod
+# intercept + angular coefficient
+summary(mod)
+# residuals (that should be normally distributed) 
+# + coefficients (intercept and disp) 
+# + Pr(>|t|) which is p-value -> stars to resume significance
+# + Adjusted R-squared
+
+# plotting model
+str(mod)
+plot(mtcars$disp,
+     mtcars$hp)
+abline(a = mod$coefficients[1], 
+       b = mod$coefficients[2]) # coefficients are intercept and slope
+# closest the points from the line smallest R-squared
+
+
+
 
