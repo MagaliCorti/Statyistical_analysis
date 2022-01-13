@@ -840,6 +840,68 @@ abline(a = mod$coefficients[1],
        b = mod$coefficients[2]) # coefficients are intercept and slope
 # closest the points from the line smallest R-squared
 
+library(vegan)
+data(dune)
+data(dune.env)
+
+dune.env$sr <- specnumber(dune)
+
+### Association measures ###
+
+mat <- matrix((c(2, 9, 8, 1)), ncol = 2) # here we create a matrix with frequencies of two species in two different habitats
+colnames(mat) <- c("sp1", "sp2")
+rownames(mat) <- c("habitat1", "habitat2")
+mat
+chisq.test(mat) # here we test if the two species are independently ditributed (p < .05 -> independent distribution)
+
+# The same as above calculated on the two most frequent species of dune dataset, across the different "Use" categories
+
+specnumber(dune, MARGIN = 2) # MARGIN = 2 enables us to calculate species frequencies
+
+species_by_use <- aggregate(dune_pa[c("Scorautu", "Trifrepe")],
+          by = list(dune.env$Use),
+          FUN = "sum") # here we calculate the frequencies of the two most common species across different Use categories
+
+chisq.test(species_by_use[, -1]) # here we test if the two species are indipendently distributed across different Use categories. The null hypothesis is that there are no difference, as the p-value much larger than .01 or .05 (actually, it's almost 1!), we can't refuse the null hypothesis
+
+install.packages("cramer")
+
+library(cramer)
+
+cramer.test(species_by_use[, 2],
+	    [, 3])
+
+### Two-sample t-test ###
+	
+t.test(dune.env$sr[dune.env$Management == "HF"],
+       dune.env$sr[dune.env$Management != "HF"],
+       alternative = "greater") # here we test the hypothesis that HF plots have higher species richness on average than the other plots
+    
+### Correlation test and linear regression ###
+    
+plot(dune.env$A1,
+     dune.env$sr)
+cor.test(dune.env$sr,
+         dune.env$A1,
+         alternative = "less") # here we test the hypothesis that species richness and soil thickness are negatively correlated	   
+
+plot(mtcars$disp,
+     mtcars$hp)
+cor.test(mtcars$disp,
+         mtcars$hp,
+         alternative = "greater") # hypothesis -> positive correlation
+mod <- lm(hp ~ disp, data = mtcars)
+summary(mod)
+str(mod, 1)
+abline(mod$coefficients[1], mod$coefficients[2])
+
+### Shapiro's normality test ###
+
+hist(dune.env$sr)
+shapiro.test(dune.env$sr)
+
+hist(dune.env$A1)
+shapiro.test(dune.env$A1)
 
 
 
