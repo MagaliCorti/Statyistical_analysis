@@ -904,4 +904,90 @@ hist(dune.env$A1)
 shapiro.test(dune.env$A1)
 
 
+     
+     
+######### BRYCE ##########
+library(vegan)
+
+# importing datasets
+bryceveg <- read.csv("data/bryceveg.csv")
+brycesite <- read.table("data/brycesite.txt", 
+                        sep = " ", # using fill = T we eliminated the emmpty cell but everything shifted
+                        header = T, # first row as column name
+                        na.strings = c("NA", "")) # specifing the two types of missing values
+
+View(brycesite)
+View(bryceveg)
+
+env_variable <- ncol(brycesite)
+species <- ncol(bryceveg)
+observation <- nrow(bryceveg)
+
+str(brycesite)
+str(bryceveg)
+
+summary(brycesite)
+# if you have NAs in summer means that we must manage it
+
+index_na <- which(is.na(brycesite), arr.ind = T) # indices of missing values with coordinate
+index_na <- index_na[, 1]
+
+# remove NAs
+brycesite <- na.omit(brycesite)# removing the entire line of brycesite and the same rows for bricesite
+bryceveg <- bryceveg[-index_na, ]     
+
+nrow(brycesite)
+nrow(bryceveg)
+
+
+brycesite$depth <- factor(brycesite$depth, 
+                          levels = c("shallow", "deep"),
+                          ordered = T)
+unique(brycesite$depth) # shows possible values of that column
+
+unique(brycesite$pos)
+brycesite$pos <- factor(brycesite$pos, 
+                        levels = c("bottom", "low_slope", "mid_slope", "up_slope", "ridge"),
+                        ordered = T)
+
+str(brycesite)
+
+bryceveg <- decostand(bryceveg, method = "pa")
+brycesite$sr <- specnumber(bryceveg) # MARGIN = 1 by default -> sum of the rows = species richness
+# we stored the result as a new column in brycesite
+specnumber(bryceveg, MARGIN = 2) # operation across the column, number of sites in which species appeard
+
+sort(specnumber(bryceveg, MARGIN = 2))
+sort(specnumber(bryceveg, MARGIN = 2), decreasing = T)
+plot(sort(specnumber(bryceveg, MARGIN = 2), decreasing = T))
+
+summary(brycesite$sr)
+
+png("Figure1.png", res = 300, width = 4000, height = 2000)
+hist(brycesite$sr, # sr distrubution
+     main = "Species richness distribution",
+     xlab = "Species richness per site")
+dev.off()
+
+barplot(table(brycesite$pos)) # cannot barplot directly pos bc it's a factor
+barplot(table(brycesite$depth, brycesite$pos),
+        legend = rownames(table(brycesite$depth, brycesite$pos)),
+        xlim = c(0, 6))
+
+boxplot(brycesite$sr ~ brycesite$pos,
+        ylim = c(0, 30))
+
+plot(brycesite$elev, brycesite$sr)
+cor.test(brycesite$elev, brycesite$sr)
+lm(sr ~ elev, data = brycesite)
+summary(lm(sr ~ elev, data = brycesite))
+
+     
+     
+     
+     
+     
+     
+     
+     
 
