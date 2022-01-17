@@ -840,6 +840,12 @@ abline(a = mod$coefficients[1],
        b = mod$coefficients[2]) # coefficients are intercept and slope
 # closest the points from the line smallest R-squared
 
+  
+     
+     
+     
+# LESSON 10
+     
 library(vegan)
 data(dune)
 data(dune.env)
@@ -862,7 +868,9 @@ species_by_use <- aggregate(dune_pa[c("Scorautu", "Trifrepe")],
           by = list(dune.env$Use),
           FUN = "sum") # here we calculate the frequencies of the two most common species across different Use categories
 
-chisq.test(species_by_use[, -1]) # here we test if the two species are indipendently distributed across different Use categories. The null hypothesis is that there are no difference, as the p-value much larger than .01 or .05 (actually, it's almost 1!), we can't refuse the null hypothesis
+chisq.test(species_by_use[, -1]) # here we test if the two species are indipendently distributed across different Use categories. 
+# The null hypothesis is that there are no difference, as the p-value much larger than .01 or .05 (actually, it's almost 1!)
+# we can't refuse the null hypothesis
 
 install.packages("cramer")
 
@@ -905,6 +913,9 @@ shapiro.test(dune.env$A1)
 
 
      
+     
+     
+# LESSON 11 -12     
      
 ######### BRYCE ##########
 library(vegan)
